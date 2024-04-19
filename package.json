@@ -1,0 +1,14 @@
+{
+  "name": "stocks-dashboard",
+  "version": "1.0.0",
+  "description": "Demo of stock prices dashboard",
+  "main": ".mongorc.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
