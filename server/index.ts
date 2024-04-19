@@ -1,5 +1,10 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+// Start the WebSocket server
+import('./websocket')
+
+// Start simulating stock data updates
+import('./stockDataStream')
 
 const app = express()
 const port = process.env.PORT || 5000
