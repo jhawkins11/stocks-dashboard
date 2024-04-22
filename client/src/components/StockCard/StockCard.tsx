@@ -23,12 +23,12 @@ const StockCard = ({
         <h4
           className={cn(
             'text-sm inline text-right',
-            // if stock price goes up then text-primary else red text
+            // if stock price goes up then green else red text
             priceHasIncreased ? 'text-primary' : 'text-destructive'
           )}
         >
           {/* up or down arrow based on stock price */}
-          {priceHasIncreased ? (
+          {!priceHasIncreased ? (
             <img src={DownSvg.src} alt='down' className='w-3 h-3 inline mr-1' />
           ) : (
             <img src={UpSvg.src} alt='up' className='w-3 h-3 inline mr-1' />

@@ -1,13 +1,13 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import StockData from '@/types/StockData'
+import React from 'react'
 import StockCard from '../StockCard/StockCard'
+import StocksTable from '../StocksTable/StocksTable'
 import { useStockDataFromWS } from '@/hooks/useStockDataFromWS'
 
 const StockDashboard: React.FC = () => {
   const stockData = useStockDataFromWS()
   return (
-    <div className='grid grid-cols-2 gap-8 max-w-4xl'>
+    <div className='grid grid-cols-2 gap-8 max-w-4xl h-80'>
       <h1 className='text-sm font-light uppercase text-primary'>
         Live Stock Data
       </h1>
@@ -28,6 +28,9 @@ const StockDashboard: React.FC = () => {
               stockHistory={stockHistory}
             />
           ))}
+      </div>
+      <div className='grid grid-cols-1 col-span-2'>
+        <StocksTable stockData={stockData} />
       </div>
     </div>
   )
