@@ -4,15 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "npm run migrate:prod && node index.js",
+    "build": "tsc",
     "dev": "nodemon index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "db-migrate up --config dbMigrateConfig.ts --env dev",
+    "migrate:prod": "db-migrate up --config dbMigrateConfig.ts --env prod",
+    "migration:create": "db-migrate create --config dbMigrateConfig.ts --env dev"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/mysql": "^2.15.26",
     "body-parser": "^1.20.2",
+    "db-migrate": "^0.11.14",
+    "db-migrate-mysql": "^2.3.2",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "typescript": "^5.4.5",
     "ws": "^8.16.0"
   },
   "devDependencies": {
