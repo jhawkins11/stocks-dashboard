@@ -10,6 +10,9 @@ import {
   Legend,
 } from 'recharts'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import UpSvg from '/public/up.svg'
+import DownSvg from '/public/down.svg'
 
 interface StockData {
   symbol: string
@@ -52,36 +55,73 @@ const StockDashboard: React.FC = () => {
   }, [stockData])
 
   return (
-    <div className='flex justify-center'>
-      <div className='max-w-4xl w-full'>
-        <h1 className='text-4xl font-bold mb-4 text-center'>Stock Dashboard</h1>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {Object.entries(stockData).map(([symbol, stockHistory]) => (
-            <Card key={symbol} className='p-4 mx-auto w-80'>
-              <CardHeader>
-                <h2 className='text-xl font-bold'>{symbol}</h2>
+    <div className='grid grid-cols-2 gap-8 max-w-4xl'>
+      <h1 className='text-sm font-light uppercase text-primary'>
+        Live Stock Data
+      </h1>
+      <h2 className='text-sm font-light uppercase text-foreground text-right'>
+        {new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })}
+      </h2>
+      <div className='grid grid-cols-3 gap-8 col-span-2'>
+        {Object.entries(stockData)
+          .slice(0, 3)
+          .map(([symbol, stockHistory]) => (
+            <Card key={symbol} className='p-4'>
+              <CardHeader className='grid grid-cols-2 items-center justify-between'>
+                <h3 className='text-sm font-light inline'>{symbol}</h3>
+                <h4
+                  className={cn(
+                    'text-sm inline text-right',
+                    // if stock price goes up then text-primary else red text
+                    stockHistory.slice(-1)[0]?.price >
+                      stockHistory.slice(-2)[0]?.price
+                      ? 'text-primary'
+                      : 'text-destructive'
+                  )}
+                >
+                  {/* up or down arrow based on stock price */}
+                  {stockHistory.slice(-1)[0]?.price <
+                  stockHistory.slice(-2)[0]?.price ? (
+                    <img
+                      src={DownSvg.src}
+                      alt='down'
+                      className='w-3 h-3 inline mr-1'
+                    />
+                  ) : (
+                    <img
+                      src={UpSvg.src}
+                      alt='up'
+                      className='w-3 h-3 inline mr-1'
+                    />
+                  )}
+                  {stockHistory.slice(-1)[0]?.price.toFixed(2) || '-'}
+                </h4>
               </CardHeader>
               <CardContent>
-                <h3 className='text-2xl font-bold'>
-                  {stockHistory.slice(-1)[0]?.price.toFixed(2) || '-'}
-                </h3>
-                <p className='text-sm mt-2'>
-                  {stockHistory.slice(-1)[0]?.timestamp || '-'}
-                </p>
                 <div className='mt-4'>
-                  <LineChart width={300} height={150} data={stockHistory}>
-                    <XAxis dataKey='timestamp' />
+                  <LineChart
+                    width={180}
+                    height={120}
+                    // only show last 10 data points
+                    data={stockHistory.slice(-10)}
+                  >
+                    <XAxis dataKey='timestamp' format={'HH:mm:ss'} />
                     <YAxis type='number' domain={['auto', 'auto']} />
-                    <CartesianGrid strokeDasharray='3 3' />
-                    <Tooltip />
-                    <Legend />
-                    <Line type='monotone' dataKey='price' stroke='#8884d8' />
+                    <Line
+                      type='monotone'
+                      dataKey='price'
+                      dot={false}
+                      stroke='hsl(var(--primary))'
+                    />
                   </LineChart>
                 </div>
               </CardContent>
             </Card>
           ))}
-        </div>
       </div>
     </div>
   )
