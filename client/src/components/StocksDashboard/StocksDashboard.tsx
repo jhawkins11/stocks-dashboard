@@ -22,7 +22,7 @@ const StockDashboard: React.FC = () => {
       <div className='grid grid-cols-3 gap-8 col-span-2'>
         {Object.entries(stockData).length
           ? Object.entries(stockData)
-              .slice(0, 3)
+              .slice(0, 6)
               .map(([symbol, stockHistory]) => (
                 <StockCard
                   key={symbol}
