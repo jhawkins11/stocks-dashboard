@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import UpSvg from '/public/up.svg'
 import DownSvg from '/public/down.svg'
 import StockData from '@/types/StockData'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const StockCard = ({
   symbol,
@@ -16,6 +17,7 @@ const StockCard = ({
   const price = stockHistory.slice(-1)[0]?.price.toFixed(2) || '-'
   const previousPrice = stockHistory.slice(-2)[0]?.price || '-'
   const priceHasIncreased = price > previousPrice
+  if (!stockHistory.length) return <Skeleton className='h-60 w-60' />
   return (
     <Card key={symbol} className='p-4'>
       <CardHeader className='grid grid-cols-2 items-center justify-between'>

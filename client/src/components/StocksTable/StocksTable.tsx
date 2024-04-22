@@ -3,6 +3,7 @@ import StockData from '@/types/StockData'
 import StockDataMap from '@/types/StockDataMap'
 import { Card } from '../ui/card'
 import { TableHeader, TableRow, TableBody, Table } from '../ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
   const getPercentageChange = (stockHistory: StockData[]) => {
@@ -10,6 +11,7 @@ const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
     const previousPrice = stockHistory.slice(-2)[0]?.price || 0
     return (((price - previousPrice) / previousPrice) * 100).toFixed(2)
   }
+  if (!Object.keys(stockData).length) return <Skeleton className='h-96' />
   return (
     <Card className='p-4'>
       <Table className='w-full text-sm text-foreground'>
