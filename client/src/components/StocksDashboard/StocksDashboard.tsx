@@ -8,7 +8,7 @@ import { Skeleton } from '../ui/skeleton'
 const StockDashboard: React.FC = () => {
   const stockData = useStockDataFromWS()
   return (
-    <div className='grid grid-cols-2 gap-8 max-w-4xl h-80'>
+    <div className='grid grid-cols-2 gap-8 max-w-4xl mb-8'>
       <h1 className='text-sm font-light uppercase text-primary'>
         Live Stock Data
       </h1>

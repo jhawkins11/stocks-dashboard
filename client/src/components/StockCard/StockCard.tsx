@@ -1,5 +1,5 @@
 import React from 'react'
-import { LineChart, Line, XAxis, YAxis } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import UpSvg from '/public/up.svg'
@@ -46,6 +46,7 @@ const StockCard = ({
             // only show last 10 data points
             data={stockHistory.slice(-10)}
           >
+            <Tooltip position={{ y: 70 }} />
             <XAxis dataKey='timestamp' format={'HH:mm:ss'} />
             <YAxis type='number' domain={['auto', 'auto']} />
             <Line

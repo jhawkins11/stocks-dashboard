@@ -1,10 +1,9 @@
 import WebSocket from 'ws'
-
-interface StockData {
-  symbol: string
-  price: number
-  timestamp: string
-}
+import {
+  broadcastInitialStockData,
+  broadcastStockData,
+} from './broadcastStockData'
+import { simulateStockDataUpdate } from './simulateStockDataUpdate'
 
 const wss = new WebSocket.Server({ port: 8080 })
 const clients: WebSocket[] = []
@@ -12,6 +11,9 @@ const clients: WebSocket[] = []
 wss.on('connection', (ws: WebSocket) => {
   clients.push(ws)
   console.log('New client connected')
+  const { history } = simulateStockDataUpdate()
+  // Send the initial stock data to the client
+  broadcastInitialStockData(history, ws)
 
   ws.on('close', () => {
     console.log('Client disconnected')
@@ -19,12 +21,8 @@ wss.on('connection', (ws: WebSocket) => {
   })
 })
 
-const broadcastStockData = (stockData: StockData[]) => {
-  clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(stockData))
-    }
-  })
-}
-
-export { broadcastStockData }
+// Broadcast stock data updates to all connected clients every 5 seconds
+setInterval(() => {
+  const { stockData } = simulateStockDataUpdate()
+  broadcastStockData(stockData, clients)
+}, 5000)
