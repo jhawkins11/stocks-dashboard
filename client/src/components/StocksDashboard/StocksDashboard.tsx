@@ -10,10 +10,12 @@ import { Eye } from 'lucide-react'
 import useToken from '@/hooks/useToken'
 import useGetWatchlist from '@/hooks/api/useGetWatchlist'
 import StockDataMap from '@/types/StockDataMap'
+import { useSyncWithLocalStorage } from '@/hooks/useSyncWithLocalStorage'
 
 const StockDashboard: React.FC = () => {
-  const [shouldFilterStocks, setShouldFilterStocks] = React.useState(
-    localStorage.getItem('shouldFilterStocks') === 'true'
+  const [shouldFilterStocks, setShouldFilterStocks] = useSyncWithLocalStorage(
+    'shouldFilterStocks',
+    false
   )
   const allStockData = useStockDataFromWS()
   const token = useToken()
@@ -66,11 +68,7 @@ const StockDashboard: React.FC = () => {
         <Switch
           color='primary'
           checked={shouldFilterStocks}
-          onCheckedChange={(checked) => {
-            setShouldFilterStocks(checked)
-            // Save the value to localStorage
-            localStorage.setItem('shouldFilterStocks', checked.toString())
-          }}
+          onCheckedChange={setShouldFilterStocks}
         ></Switch>
       </div>
     </div>
