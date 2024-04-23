@@ -1,3 +1,4 @@
+import { useError } from '@/lib/ErrorContext'
 import { useMutation, useQueryClient } from 'react-query'
 
 const addToWatchlist = async (data: { symbol: string; token: string }) => {
@@ -16,9 +17,16 @@ const addToWatchlist = async (data: { symbol: string; token: string }) => {
 
 export const useAddToWatchlist = () => {
   const queryClient = useQueryClient()
-  return useMutation(addToWatchlist, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('watchlist')
-    },
-  })
+  const { setError } = useError()
+  return useMutation<void, Error, { symbol: string; token: string }>(
+    addToWatchlist,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('watchlist')
+      },
+      onError: (error) => {
+        setError(error)
+      },
+    }
+  )
 }

@@ -4,13 +4,12 @@ import StockCard from '../StockCard/StockCard'
 import StocksTable from '../StocksTable/StocksTable'
 import { useStockDataFromWS } from '@/hooks/api/useStockDataFromWS'
 import { Skeleton } from '../ui/skeleton'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { Switch } from '../ui/switch'
-import { Eye } from 'lucide-react'
 import useToken from '@/hooks/useToken'
 import useGetWatchlist from '@/hooks/api/useGetWatchlist'
 import StockDataMap from '@/types/StockDataMap'
 import { useSyncWithLocalStorage } from '@/hooks/useSyncWithLocalStorage'
+import { ErrorAlert } from '../ErrorAlert'
 
 const StockDashboard: React.FC = () => {
   const [shouldFilterStocks, setShouldFilterStocks] = useSyncWithLocalStorage(
@@ -71,6 +70,7 @@ const StockDashboard: React.FC = () => {
           onCheckedChange={setShouldFilterStocks}
         ></Switch>
       </div>
+      <ErrorAlert />
     </div>
   )
 }

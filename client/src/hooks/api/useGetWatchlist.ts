@@ -1,3 +1,4 @@
+import { useError } from '@/lib/ErrorContext'
 import { useQuery } from 'react-query'
 
 interface Watchlist {
@@ -24,12 +25,16 @@ const fetchWatchlist = async (token: string): Promise<Watchlist[]> => {
 }
 
 const useGetWatchlist = (token: string) => {
+  const { setError } = useError()
   return useQuery<Watchlist[], Error>(
     'watchlist',
     () => fetchWatchlist(token),
     {
       refetchInterval: 5000,
       enabled: !!token,
+      onError: (error) => {
+        setError(error)
+      },
     }
   )
 }
