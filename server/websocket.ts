@@ -5,7 +5,7 @@ import {
 } from './broadcastStockData'
 import { simulateStockDataUpdate } from './simulateStockDataUpdate'
 
-const wss = new WebSocket.Server({ port: 8080 })
+const wss = new WebSocket.Server({ noServer: true })
 const clients: WebSocket[] = []
 
 wss.on('connection', (ws: WebSocket) => {
@@ -26,3 +26,5 @@ setInterval(() => {
   const { stockData } = simulateStockDataUpdate()
   broadcastStockData(stockData, clients)
 }, 5000)
+
+export { wss }

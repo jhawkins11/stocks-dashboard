@@ -2,9 +2,8 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import db from './db'
 import cors from 'cors'
+import { wss } from './websocket'
 require('dotenv').config()
-// Start the WebSocket server
-import('./websocket')
 
 // Start simulating stock data updates
 import('./simulateStockDataUpdate')
@@ -56,8 +55,15 @@ app.delete('/watchlist', async function (req, res) {
   }
 })
 
-app.listen(port, function () {
+const server = app.listen(port, function () {
   console.log(`Listening on port ${port}.`)
+})
+
+// Upgrade the incoming HTTP request to a WebSocket connection
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request)
+  })
 })
 
 export default app
