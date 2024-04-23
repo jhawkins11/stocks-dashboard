@@ -20,41 +20,40 @@ app.get('/', function (req, res) {
   res.send('<h1>Stock Dashboard API</h1>')
 })
 
-app.post('/watchlist', function (req, res) {
+app.post('/watchlist', async function (req, res) {
   const { symbol, token } = req.body
-  console.log(symbol, token)
   const query = `INSERT INTO watchlists (stock_symbol, token) VALUES ('${symbol}', '${token}')`
-  db.query(query, function (err, result) {
-    if (err) {
-      console.log(err)
-      res.status(500).send(err.message)
-    } else {
-      res.send('Added to watchlist')
-    }
-  })
+  try {
+    await db.query(query)
+    res.send('Added to watchlist')
+  } catch (err) {
+    console.log(err)
+    res.status(500).send((err as Error).message)
+  }
 })
 
-app.get('/watchlist', function (req, res) {
+app.get('/watchlist', async function (req, res) {
   const { token } = req.query
   const query = `SELECT stock_symbol FROM watchlists WHERE token = '${token}'`
-  db.query(query, function (err, result) {
-    if (err) {
-      res.status(500).send(err.message)
-    }
-    res.send(result)
-  })
+  try {
+    const result = await db.query(query)
+    res.send(result[0])
+  } catch (err) {
+    console.log(err)
+    res.status(500).send((err as Error).message)
+  }
 })
 
-app.delete('/watchlist', function (req, res) {
+app.delete('/watchlist', async function (req, res) {
   const { symbol, token } = req.body
   const query = `DELETE FROM watchlists WHERE stock_symbol = '${symbol}' AND token = '${token}'`
-  db.query(query, function (err, result) {
-    if (err) {
-      res.status(500).send(err.message)
-    } else {
-      res.send('Removed from watchlist')
-    }
-  })
+  try {
+    await db.query(query)
+    res.send('Deleted from watchlist')
+  } catch (err) {
+    console.log(err)
+    res.status(500).send((err as Error).message)
+  }
 })
 
 app.listen(port, function () {

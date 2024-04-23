@@ -5,6 +5,10 @@ import { Card } from '../ui/card'
 import { TableHeader, TableRow, TableBody, Table } from '../ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import useToken from '@/hooks/useToken'
+import { PlusCircle } from 'lucide-react'
+import useGetWatchlist from '@/hooks/api/useGetWatchlist'
+import { useAddToWatchlist } from '@/hooks/api/useAddToWatchlist'
+import { useDeleteFromWatchlist } from '@/hooks/api/useDeleteFromWatchlist'
 
 const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
   const token = useToken()
@@ -13,32 +17,17 @@ const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
     const previousPrice = stockHistory.slice(-2)[0]?.price || 0
     return (((price - previousPrice) / previousPrice) * 100).toFixed(2)
   }
-  const handleAddToWatchlist = async (symbol: string) => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/watchlist`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ symbol, token }),
-      })
-    } catch (error) {
-      console.error(error)
-    }
+  const { data: watchlist } = useGetWatchlist(token)
+  const { mutate: addToWatchlist } = useAddToWatchlist()
+  const { mutate: deleteFromWatchlist } = useDeleteFromWatchlist()
+
+  const handleAddToWatchlist = (symbol: string, token: string) => {
+    addToWatchlist({ symbol, token })
   }
-  const handleRemoveFromWatchlist = async (symbol: string) => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/watchlist`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ symbol, token }),
-      })
-    } catch (error) {
-      console.error(error)
-    }
+  const handleDeleteFromWatchlist = (symbol: string, token: string) => {
+    deleteFromWatchlist({ symbol, token })
   }
+
   if (!Object.keys(stockData).length) return <Skeleton className='h-96' />
   return (
     <Card className='p-4'>
@@ -58,25 +47,17 @@ const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
               className='hover:bg-muted/50 transition-colors font-light text-sm h-10'
             >
               <td className='text-left'>
-                <button
-                  onClick={() =>
-                    handleAddToWatchlist(symbol).catch((error) =>
-                      console.error(error)
-                    )
-                  }
-                  className='mr-2'
-                >
-                  +
-                </button>
-                <button
-                  onClick={() =>
-                    handleRemoveFromWatchlist(symbol).catch((error) =>
-                      console.error(error)
-                    )
-                  }
-                >
-                  -
-                </button>
+                {watchlist?.find((w) => w.stock_symbol === symbol) ? (
+                  <button
+                    onClick={() => handleDeleteFromWatchlist(symbol, token)}
+                  >
+                    <PlusCircle className='text-primary' size={20} />
+                  </button>
+                ) : (
+                  <button onClick={() => handleAddToWatchlist(symbol, token)}>
+                    <PlusCircle className='text-foreground' size={20} />
+                  </button>
+                )}
               </td>
               <td>{symbol}</td>
               <td className='text-center'>
