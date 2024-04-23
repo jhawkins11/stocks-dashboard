@@ -62,6 +62,22 @@ npm run dev
 
 The frontend will start on port 3000.
 
+## Testing
+
+### Backend
+
+1. Navigate to the server directory:
+
+```sh
+cd server
+```
+
+2. Run tests:
+
+```sh
+npm test
+```
+
 ## Features
 
 - Simulated real-time stock data updates
