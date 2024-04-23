@@ -4,7 +4,7 @@ export const useWebSocket = (): WebSocket | null => {
   const [wsocket, setWsocket] = useState<WebSocket | null>(null)
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080')
+    const socket = new WebSocket(process.env.NEXT_PUBLIC_WS_URL as string)
     socket.onopen = () => {
       console.log('WebSocket connection opened')
       setWsocket(socket)
