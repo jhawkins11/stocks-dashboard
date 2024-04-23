@@ -4,12 +4,40 @@ import StockDataMap from '@/types/StockDataMap'
 import { Card } from '../ui/card'
 import { TableHeader, TableRow, TableBody, Table } from '../ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import useToken from '@/hooks/useToken'
 
 const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
+  const token = useToken()
   const getPercentageChange = (stockHistory: StockData[]) => {
     const price = stockHistory.slice(-1)[0]?.price || 0
     const previousPrice = stockHistory.slice(-2)[0]?.price || 0
     return (((price - previousPrice) / previousPrice) * 100).toFixed(2)
+  }
+  const handleAddToWatchlist = async (symbol: string) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/watchlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ symbol, token }),
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  const handleRemoveFromWatchlist = async (symbol: string) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/watchlist`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ symbol, token }),
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
   if (!Object.keys(stockData).length) return <Skeleton className='h-96' />
   return (
@@ -30,7 +58,25 @@ const StocksTable = ({ stockData }: { stockData: StockDataMap }) => {
               className='hover:bg-muted/50 transition-colors font-light text-sm h-10'
             >
               <td className='text-left'>
-                <button>+</button>
+                <button
+                  onClick={() =>
+                    handleAddToWatchlist(symbol).catch((error) =>
+                      console.error(error)
+                    )
+                  }
+                  className='mr-2'
+                >
+                  +
+                </button>
+                <button
+                  onClick={() =>
+                    handleRemoveFromWatchlist(symbol).catch((error) =>
+                      console.error(error)
+                    )
+                  }
+                >
+                  -
+                </button>
               </td>
               <td>{symbol}</td>
               <td className='text-center'>
