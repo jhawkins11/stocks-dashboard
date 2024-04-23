@@ -1,6 +1,9 @@
 # Stocks Dashboard
 
 This project consists of a Next.js frontend and an Express.js backend. The frontend displays stock data that is updated in real-time via a WebSocket connection to the backend.
+<br />
+
+<a href="https://stocks-dashboard-pi.vercel.app/">View Demo</a>
 
 ## Prerequisites
 
