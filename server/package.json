@@ -32,7 +32,8 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "axios": "^1.4.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.5",

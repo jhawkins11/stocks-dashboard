@@ -3,17 +3,36 @@ import {
   broadcastInitialStockData,
   broadcastStockData,
 } from './broadcastStockData'
-import { simulateStockDataUpdate } from './simulateStockDataUpdate'
+import { fetchStockData } from './services/stockService'
+import { StockData } from './types/StockData'
+
+// Define the maximum number of history points
+const MAX_HISTORY = 5
+
+// In-memory store for stock histories
+const stockHistories: { [symbol: string]: StockData[] } = {}
 
 const wss = new WebSocket.Server({ noServer: true })
 const clients: WebSocket[] = []
 
-wss.on('connection', (ws: WebSocket) => {
+wss.on('connection', async (ws: WebSocket) => {
   clients.push(ws)
   console.log('New client connected')
-  const { history } = simulateStockDataUpdate()
-  // Send the initial stock data to the client
-  broadcastInitialStockData(history, ws)
+
+  if (Object.keys(stockHistories).length === 0) {
+    const stockData = await fetchStockData()
+    stockData.forEach((stock) => {
+      if (!stockHistories[stock.symbol]) {
+        stockHistories[stock.symbol] = []
+      }
+      stockHistories[stock.symbol].push(stock)
+    })
+  }
+
+  // Prepare history data to send
+  const historyData: StockData[][] = Object.values(stockHistories)
+
+  broadcastInitialStockData(historyData, ws)
 
   ws.on('close', () => {
     console.log('Client disconnected')
@@ -21,10 +40,23 @@ wss.on('connection', (ws: WebSocket) => {
   })
 })
 
-// Broadcast stock data updates to all connected clients every 5 seconds
-setInterval(() => {
-  const { stockData } = simulateStockDataUpdate()
-  broadcastStockData(stockData, clients)
-}, 5000)
+// Broadcast stock data updates to all connected clients every 60 seconds
+setInterval(async () => {
+  const stockData = await fetchStockData()
+  if (stockData.length > 0) {
+    // Update histories
+    stockData.forEach((stock) => {
+      if (!stockHistories[stock.symbol]) {
+        stockHistories[stock.symbol] = []
+      }
+      stockHistories[stock.symbol].push(stock)
+      if (stockHistories[stock.symbol].length > MAX_HISTORY) {
+        stockHistories[stock.symbol].shift()
+      }
+    })
+
+    broadcastStockData(stockData, clients)
+  }
+}, 60000) // Fetch every 60 seconds
 
 export { wss }

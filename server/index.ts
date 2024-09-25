@@ -5,9 +5,6 @@ import cors from 'cors'
 import { wss } from './websocket'
 require('dotenv').config()
 
-// Start simulating stock data updates
-import('./simulateStockDataUpdate')
-
 const app = express()
 const port = process.env.PORT || 5000
 

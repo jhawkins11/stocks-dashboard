@@ -1,10 +1,5 @@
 import WebSocket from 'ws'
-
-interface StockData {
-  symbol: string
-  price: number
-  timestamp: string
-}
+import { StockData } from './types/StockData'
 
 interface SocketMessage {
   type: 'initial' | 'update'
