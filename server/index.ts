@@ -17,6 +17,10 @@ app.get('/', function (req, res) {
 })
 
 app.post('/watchlist', async function (req, res) {
+  if (!db) {
+    return res.status(500).send('Database connection not available')
+  }
+
   const { symbol, token } = req.body
   const query = `INSERT INTO watchlists (stock_symbol, token) VALUES ('${symbol}', '${token}')`
   try {
@@ -29,6 +33,10 @@ app.post('/watchlist', async function (req, res) {
 })
 
 app.get('/watchlist', async function (req, res) {
+  if (!db) {
+    return res.status(500).send('Database connection not available')
+  }
+
   const { token } = req.query
   const query = `SELECT stock_symbol FROM watchlists WHERE token = '${token}'`
   try {
@@ -41,6 +49,10 @@ app.get('/watchlist', async function (req, res) {
 })
 
 app.delete('/watchlist', async function (req, res) {
+  if (!db) {
+    return res.status(500).send('Database connection not available')
+  }
+
   const { symbol, token } = req.body
   const query = `DELETE FROM watchlists WHERE stock_symbol = '${symbol}' AND token = '${token}'`
   try {
