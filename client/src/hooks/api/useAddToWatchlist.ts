@@ -34,15 +34,12 @@ const addToWatchlist = async (data: { symbol: string; token: string }) => {
 export const useAddToWatchlist = () => {
   const queryClient = useQueryClient()
   const { setError } = useError()
-  const isProduction = process.env.NODE_ENV === 'production'
 
   return useMutation<void, Error, { symbol: string; token: string }>(
     addToWatchlist,
     {
       onSuccess: () => {
-        if (!isProduction) {
-          queryClient.invalidateQueries('watchlist')
-        }
+        queryClient.invalidateQueries('watchlist')
       },
       onError: (error) => {
         setError(error)
