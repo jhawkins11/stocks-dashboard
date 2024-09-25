@@ -5,9 +5,15 @@ import db from '../db'
 describe('Watchlist routes', () => {
   // delete all test records from the watchlists table before each test
   beforeEach(async () => {
+    if (!db) {
+      throw new Error('Database not initialized')
+    }
     await db.query('DELETE FROM watchlists WHERE token = "testtoken"')
   })
   afterAll(async () => {
+    if (!db) {
+      throw new Error('Database not initialized')
+    }
     await db.end()
   })
 
@@ -21,6 +27,9 @@ describe('Watchlist routes', () => {
     })
 
     it('should handle database errors', async () => {
+      if (!db) {
+        throw new Error('Database not initialized')
+      }
       // Mock the db.query function to throw an error
       jest.spyOn(db, 'query').mockRejectedValueOnce(new Error('Database error'))
 
@@ -34,6 +43,9 @@ describe('Watchlist routes', () => {
 
   describe('GET /watchlist', () => {
     it('should retrieve the watchlist for a given token', async () => {
+      if (!db) {
+        throw new Error('Database not initialized')
+      }
       // Add a stock to the watchlist before the test
       await db.query(
         `INSERT INTO watchlists (stock_symbol, token) VALUES ('AAPL', 'testtoken')`
@@ -47,6 +59,9 @@ describe('Watchlist routes', () => {
     })
 
     it('should handle database errors', async () => {
+      if (!db) {
+        throw new Error('Database not initialized')
+      }
       // Mock the db.query function to throw an error
       jest.spyOn(db, 'query').mockRejectedValueOnce(new Error('Database error'))
 
@@ -60,6 +75,9 @@ describe('Watchlist routes', () => {
 
   describe('DELETE /watchlist', () => {
     it('should delete a stock from the watchlist', async () => {
+      if (!db) {
+        throw new Error('Database not initialized')
+      }
       // Add a stock to the watchlist before the test
       await db.query(
         `INSERT INTO watchlists (stock_symbol, token) VALUES ('AAPL', 'testtoken')`
@@ -73,6 +91,9 @@ describe('Watchlist routes', () => {
     })
 
     it('should handle database errors', async () => {
+      if (!db) {
+        throw new Error('Database not initialized')
+      }
       // Mock the db.query function to throw an error
       jest.spyOn(db, 'query').mockRejectedValueOnce(new Error('Database error'))
 
