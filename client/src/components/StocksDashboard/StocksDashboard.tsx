@@ -22,10 +22,12 @@ const StockDashboard: React.FC = () => {
 
   // Filter stock data based on watchlist if shouldFilterStocks is true
   const stockData: StockDataMap = React.useMemo(() => {
-    if (!shouldFilterStocks) return allStockData
+    if (!shouldFilterStocks || !watchlist || watchlist.length === 0) {
+      return allStockData
+    }
     return Object.fromEntries(
       Object.entries(allStockData).filter(([symbol]) =>
-        watchlist?.some((w) => w.stock_symbol === symbol)
+        watchlist.some((w) => w.stock_symbol === symbol)
       )
     )
   }, [allStockData, shouldFilterStocks, watchlist])
