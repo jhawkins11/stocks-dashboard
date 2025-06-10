@@ -35,6 +35,36 @@ MYSQL_PASSWORD=*your_mysql_password*
 MYSQL_DATABASE=*your_mysql_database*
 ```
 
+### Data Source Configuration
+
+The application supports two data modes:
+
+**Simulated Data Mode**
+
+- Uses realistic simulated stock data with price fluctuations
+- No API rate limits or external dependencies
+- Reliable for demos and production deployments
+- This is the default mode when no configuration is provided
+
+**Live API Mode**
+
+- Fetches real stock data from external APIs
+- May hit rate limits and cause service interruptions
+- Requires API credentials to be configured
+
+To configure the data source, add the following to your `.env` file:
+
+```
+# For live API data (optional - may hit rate limits)
+REALSTONKS_API_KEY=*your_api_key*
+REALSTONKS_API_URL=*your_api_url*
+USE_REAL_DATA=true
+
+# Leave USE_REAL_DATA unset or set to false for simulated data (recommended)
+```
+
+**Note**: The deployed demo uses simulated data to ensure consistent availability for viewers.
+
 4. Start the server:
 
 ```sh
@@ -83,7 +113,8 @@ npm test
 
 ## Features
 
-- Simulated real-time stock data updates
+- Real-time stock data updates (simulated or live API)
+- Configurable data source (simulated for reliability, live API for development)
 - Add stocks to a watchlist
 - Remove stocks from the watchlist
 - Filter stocks by watchlist
