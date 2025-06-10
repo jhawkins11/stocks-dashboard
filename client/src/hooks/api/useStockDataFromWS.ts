@@ -39,19 +39,26 @@ export const useStockDataFromWS = (): StockDataMap => {
         setStockData(initialStockDataMap)
       } else if (message.type === 'update') {
         const updates = message.data as StockData[]
-        const updatedStockDataMap = { ...stockData }
-        updates.forEach((stockItem) => {
-          if (updatedStockDataMap[stockItem.symbol]) {
-            updatedStockDataMap[stockItem.symbol].push(stockItem)
-            // Keep only the last 5 data points
-            if (updatedStockDataMap[stockItem.symbol].length > 5) {
-              updatedStockDataMap[stockItem.symbol].shift()
+        setStockData((currentStockData) => {
+          const updatedStockDataMap = { ...currentStockData }
+          updates.forEach((stockItem) => {
+            const formattedStockItem = {
+              ...stockItem,
+              timestamp: new Date(stockItem.timestamp).toLocaleTimeString(),
+              price: Number(stockItem.price.toFixed(2)),
             }
-          } else {
-            updatedStockDataMap[stockItem.symbol] = [stockItem]
-          }
+            if (updatedStockDataMap[stockItem.symbol]) {
+              updatedStockDataMap[stockItem.symbol].push(formattedStockItem)
+              // Keep only the last 5 data points
+              if (updatedStockDataMap[stockItem.symbol].length > 5) {
+                updatedStockDataMap[stockItem.symbol].shift()
+              }
+            } else {
+              updatedStockDataMap[stockItem.symbol] = [formattedStockItem]
+            }
+          })
+          return updatedStockDataMap
         })
-        setStockData(updatedStockDataMap)
       }
     }
 
@@ -60,7 +67,7 @@ export const useStockDataFromWS = (): StockDataMap => {
     return () => {
       wsocket.removeEventListener('message', handleMessage)
     }
-  }, [wsocket, stockData])
+  }, [wsocket])
 
   return stockData
 }
