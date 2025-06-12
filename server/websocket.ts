@@ -45,8 +45,7 @@ const startStockDataFetching = () => {
   if (stockDataInterval) return
 
   console.log('Starting stock data fetching...')
-  fetchDataAndBroadcast() // Run immediately
-  stockDataInterval = setInterval(fetchDataAndBroadcast, 60000)
+  stockDataInterval = setInterval(fetchDataAndBroadcast, 8000)
 }
 
 const stopStockDataFetching = () => {
@@ -63,12 +62,35 @@ wss.on('connection', async (ws: WebSocket) => {
 
   // If we have no data, fetch it before sending initial data.
   if (Object.keys(stockHistories).length === 0) {
-    console.log('No history. Fetching initial data...')
-    const stockData = await fetchStockData()
-    if (stockData.length > 0) {
-      stockData.forEach((stock) => {
-        stockHistories[stock.symbol] = [stock]
-      })
+    // For demo purposes, create initial history with multiple data points
+    // This simulates the market having been running for a while
+    const initialHistorySize = 5
+
+    for (let i = initialHistorySize - 1; i >= 0; i--) {
+      const stockData = await fetchStockData()
+      if (stockData.length > 0) {
+        // Adjust timestamps to simulate historical data
+        const historicalTimestamp = new Date(
+          Date.now() - i * 8000
+        ).toISOString()
+
+        stockData.forEach((stock) => {
+          const historicalStock = {
+            ...stock,
+            timestamp: historicalTimestamp,
+          }
+
+          if (!stockHistories[stock.symbol]) {
+            stockHistories[stock.symbol] = []
+          }
+          stockHistories[stock.symbol].push(historicalStock)
+        })
+      }
+
+      // Small delay between historical data points to simulate realistic price evolution
+      if (i > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
     }
   }
 

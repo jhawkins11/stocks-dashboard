@@ -18,11 +18,17 @@ const StockDashboard: React.FC = () => {
   )
   const allStockData = useStockDataFromWS()
   const token = useToken()
-  const { data: watchlist } = useGetWatchlist(token)
+  const { data: watchlist, isLoading: isWatchlistLoading } =
+    useGetWatchlist(token)
 
   // Filter stock data based on watchlist if shouldFilterStocks is true
   const stockData: StockDataMap = React.useMemo(() => {
-    if (!shouldFilterStocks || !watchlist || watchlist.length === 0) {
+    if (
+      isWatchlistLoading ||
+      !shouldFilterStocks ||
+      !watchlist ||
+      watchlist.length === 0
+    ) {
       return allStockData
     }
     return Object.fromEntries(
@@ -30,7 +36,7 @@ const StockDashboard: React.FC = () => {
         watchlist.some((w) => w.stock_symbol === symbol)
       )
     )
-  }, [allStockData, shouldFilterStocks, watchlist])
+  }, [allStockData, shouldFilterStocks, watchlist, isWatchlistLoading])
 
   return (
     <div className='grid grid-cols-2 gap-8 max-w-4xl mb-8'>

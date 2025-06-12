@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useWebSocket } from './useWebSocket'
+import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import StockData from '@/types/StockData'
 import StockDataMap from '@/types/StockDataMap'
 
@@ -18,13 +18,32 @@ const formatStockData = (stockData: StockData[]): StockData[] => {
 
 export const useStockDataFromWS = (): StockDataMap => {
   const [stockData, setStockData] = useState<StockDataMap>({})
-  const wsocket = useWebSocket()
+  const socketRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    if (!wsocket) return
+    // Ensure this effect runs only once.
+    if (socketRef.current) return
 
-    const handleMessage = (event: MessageEvent) => {
+    socketRef.current = new WebSocket(process.env.NEXT_PUBLIC_WS_URL as string)
+    const socket = socketRef.current
+
+    socket.onopen = () => {
+      console.log('WebSocket connection opened')
+    }
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed')
+      socketRef.current = null
+    }
+
+    socket.onerror = (event) => {
+      console.error('WebSocket error:', event)
+      socketRef.current = null
+    }
+
+    socket.onmessage = (event: MessageEvent) => {
       const message: SocketMessage = JSON.parse(event.data)
+
       if (message.type === 'initial') {
         const initialData = message.data as StockData[][]
         const formattedData = initialData.map(formatStockData).flat()
@@ -36,38 +55,43 @@ export const useStockDataFromWS = (): StockDataMap => {
             initialStockDataMap[stockItem.symbol] = [stockItem]
           }
         })
-        setStockData(initialStockDataMap)
+        flushSync(() => {
+          setStockData(initialStockDataMap)
+        })
       } else if (message.type === 'update') {
         const updates = message.data as StockData[]
-        setStockData((currentStockData) => {
-          const updatedStockDataMap = { ...currentStockData }
-          updates.forEach((stockItem) => {
-            const formattedStockItem = {
-              ...stockItem,
-              timestamp: new Date(stockItem.timestamp).toLocaleTimeString(),
-              price: Number(stockItem.price.toFixed(2)),
-            }
-            if (updatedStockDataMap[stockItem.symbol]) {
-              updatedStockDataMap[stockItem.symbol].push(formattedStockItem)
-              // Keep only the last 5 data points
-              if (updatedStockDataMap[stockItem.symbol].length > 5) {
-                updatedStockDataMap[stockItem.symbol].shift()
+        flushSync(() => {
+          setStockData((currentStockData) => {
+            const updatedStockDataMap = { ...currentStockData }
+            updates.forEach((stockItem) => {
+              const formattedStockItem = {
+                ...stockItem,
+                timestamp: new Date(stockItem.timestamp).toLocaleTimeString(),
+                price: Number(stockItem.price.toFixed(2)),
               }
-            } else {
-              updatedStockDataMap[stockItem.symbol] = [formattedStockItem]
-            }
+              if (updatedStockDataMap[stockItem.symbol]) {
+                updatedStockDataMap[stockItem.symbol].push(formattedStockItem)
+                if (updatedStockDataMap[stockItem.symbol].length > 5) {
+                  updatedStockDataMap[stockItem.symbol].shift()
+                }
+              } else {
+                updatedStockDataMap[stockItem.symbol] = [formattedStockItem]
+              }
+            })
+            return updatedStockDataMap
           })
-          return updatedStockDataMap
         })
       }
     }
 
-    wsocket.addEventListener('message', handleMessage)
-
+    // Cleanup function to close the socket when the component unmounts.
     return () => {
-      wsocket.removeEventListener('message', handleMessage)
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close()
+      }
+      socketRef.current = null
     }
-  }, [wsocket])
+  }, [])
 
   return stockData
 }

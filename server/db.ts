@@ -3,7 +3,7 @@ require('dotenv').config()
 
 let pool: mysql.Pool | null = null
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV !== 'production') {
   pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
